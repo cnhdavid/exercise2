@@ -12,11 +12,18 @@ public class Movie {
     private final String description;
     private final List<Genre> genres;
     private static MovieAPI movieAPI;
+    private final List<String> mainCast;
+    private final String director;
+    private final int releaseYear;
 
-    public Movie(String title, String description, List<Genre> genres) {
+
+    public Movie(String title, String description, List<Genre> genres, List<String> mainCast, String director, int releaseYear) {
         this.title = title;
         this.description = description;
         this.genres = genres;
+        this.mainCast = mainCast;
+        this.director = director;
+        this.releaseYear = releaseYear;
     }
 
     @Override
@@ -44,8 +51,22 @@ public class Movie {
     public List<Genre> getGenres() {
         return genres;
     }
+    public List<String> getMainCast() {
+        return mainCast;
+    }
 
-    public static List<Movie> initializeMovies() throws IOException {
+    // Getter-Methode für director hinzugefügt
+    public String getDirector() {
+        return director;
+    }
+
+    // Getter-Methode für releaseYear hinzugefügt
+    public int getReleaseYear() {
+        return releaseYear;
+    }
+
+
+    public static List<Movie> initializeMovies() throws IOException, IOException {
         List<Movie> movies = movieAPI.fetchMovies("","");
 
         return movies;
