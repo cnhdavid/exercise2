@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
@@ -14,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
@@ -41,20 +43,26 @@ public class HomeController implements Initializable {
     protected ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
 
     protected SortedState sortedState;
+    private MovieAPI movieAPI = new MovieAPI();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        initializeState();
+        loadMovies();
         initializeLayout();
     }
 
-    public void initializeState() {
-        allMovies = Movie.initializeMovies();
-        observableMovies.clear();
-        observableMovies.addAll(allMovies); // add all movies to the observable list
-        sortedState = SortedState.NONE;
-    }
+    private void loadMovies() {
+        try {
+            List<Movie> movies = movieAPI.fetchMovies("", "");
+            allMovies = movies;
+            observableMovies.clear();
+            observableMovies.addAll(movies);
+            sortedState = sortedState.NONE;
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void initializeLayout() {
         movieListView.setItems(observableMovies);   // set the items of the listview to the observable list
         movieListView.setCellFactory(movieListView -> new MovieCell()); // apply custom cells to the listview
