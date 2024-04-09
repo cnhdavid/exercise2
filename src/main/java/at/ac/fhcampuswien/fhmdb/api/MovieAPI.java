@@ -21,8 +21,11 @@ public class MovieAPI {
 
     public List<Movie> fetchMovies(String searchText, Object genre, String rating, String releaseYearStr) throws IOException {
         // Parse releaseYearStr into an int if it's not empty
-       
-        String genreString = (genre instanceof String) ? (String) genre : ((Genre) genre).getName();
+
+        String genreString = "";
+        if (genre != null) {
+            genreString = (genre instanceof String) ? (String) genre : ((Genre) genre).getName();
+        }
 
         String url = constructUrl(searchText, genreString, rating, releaseYearStr);
 
