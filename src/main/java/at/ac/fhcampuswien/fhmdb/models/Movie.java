@@ -3,27 +3,31 @@ package at.ac.fhcampuswien.fhmdb.models;
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Movie {
-    private final String title;
-    private final String description;
-    private final List<Genre> genres;
-    private static MovieAPI movieAPI;
-    private final List<String> mainCast;
-    private final String director;
-    private final int releaseYear;
+    private String id;
+    private String title;
+    private List<Genre> genres;
+    private final String releaseYear;
+    private String description;
+    private String imgUrl;
+    private int lengthInMinutes;
+    private List<String> directors;
+    private List<String> writers;
+    private List<String> mainCast;
+    private double rating;
 
 
-    public Movie(String title, String description, List<Genre> genres, List<String> mainCast, String director, int releaseYear) {
+    public Movie(String title, String description, List<Genre> genres, List<String> mainCast, String director, int releaseYear, double rating) {
         this.title = title;
         this.description = description;
         this.genres = genres;
         this.mainCast = mainCast;
-        this.director = director;
-        this.releaseYear = releaseYear;
+        this.directors = Collections.singletonList(director);
+        this.releaseYear = String.valueOf(releaseYear);
+        this.rating = rating;
     }
 
     @Override
@@ -56,19 +60,41 @@ public class Movie {
     }
 
     // Getter-Methode für director hinzugefügt
-    public String getDirector() {
-        return director;
+    public List<String> getDirector() {
+        return this.directors;
     }
 
     // Getter-Methode für releaseYear hinzugefügt
-    public int getReleaseYear() {
+    public String getReleaseYear() {
         return releaseYear;
     }
 
 
     public static List<Movie> initializeMovies() throws IOException, IOException {
-        List<Movie> movies = movieAPI.fetchMovies("","");
+        MovieAPI movieAPI = new MovieAPI();
+
+        List<Movie> movies = movieAPI.fetchMovies("","","", "");
 
         return movies;
+    }
+
+    public String getImgUrl() {
+        return this.imgUrl;
+    }
+
+    public int getLengthInMinutes() {
+        return this.lengthInMinutes;
+    }
+
+    public List getDirectors() {
+        return this.directors;
+    }
+
+    public List getWriters() {
+        return  this.writers;
+    }
+
+    public double getRating() {
+        return this.rating;
     }
 }

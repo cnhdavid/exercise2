@@ -37,11 +37,13 @@ public class HomeController implements Initializable {
     public JFXButton sortBtn;
 
     public List<Movie> allMovies;
+    public TextField releaseYearField;
+    public TextField ratingFilterField;
 
     protected ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
 
     protected SortedState sortedState;
-    private MovieAPI movieAPI = new MovieAPI();
+    private final MovieAPI movieAPI = new MovieAPI();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -51,7 +53,7 @@ public class HomeController implements Initializable {
 
     public void loadMovies() {
         try {
-            List<Movie> movies = movieAPI.fetchMovies("", "");
+            List<Movie> movies = movieAPI.fetchMovies("", "","", "");
             allMovies = movies;
             observableMovies.clear();
             observableMovies.addAll(movies);
@@ -101,8 +103,8 @@ public class HomeController implements Initializable {
         return movies.stream()
                 .filter(Objects::nonNull)
                 .filter(movie ->
-                    movie.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                    movie.getDescription().toLowerCase().contains(query.toLowerCase())
+                        movie.getTitle().toLowerCase().contains(query.toLowerCase()) ||
+                                movie.getDescription().toLowerCase().contains(query.toLowerCase())
                 )
                 .toList();
     }
@@ -120,32 +122,34 @@ public class HomeController implements Initializable {
                 .toList();
     }
 
-    public void applyAllFilters(String searchQuery, Object genre) {
-        List<Movie> filteredMovies = allMovies;
+    public void applyAllFilters(String searchQuery, Object genre, String rating, String releaseYearStr) {
+        try {
+            List<Movie> movies = movieAPI.fetchMovies(searchQuery,  genre, rating, releaseYearStr);
 
-        if (!searchQuery.isEmpty()) {
-            filteredMovies = filterByQuery(filteredMovies, searchQuery);
+            observableMovies.clear();
+            observableMovies.addAll(movies);
+
+            // Count movies in each genre and print the results
+
+        } catch (IOException e) {
+            System.err.println("Error fetching movies: " + e.getMessage());
+            // Handle the error or throw an exception as per your application's logic
         }
-
-        if (genre != null && !genre.toString().equals("No filter")) {
-            Genre selectedGenre = Genre.valueOf(genre.toString());
-            filteredMovies = filterByGenre(filteredMovies, selectedGenre);
-        }
-
-        observableMovies.clear();
-        observableMovies.addAll(filteredMovies);
-
-        // Count movies in each genre and print the results
-        countMoviesInEachGenre(filteredMovies);
     }
+
 
     public void searchBtnClicked(ActionEvent actionEvent) {
-        String searchQuery = searchField.getText().trim().toLowerCase();
-        Object genre = genreComboBox.getSelectionModel().getSelectedItem();
+        String searchText = searchField.getText();
+        Object genre = (Genre) genreComboBox.getValue();
+        String rating = ratingFilterField.getText();
+        String releaseYearStr = releaseYearField.getText();
 
-        applyAllFilters(searchQuery, genre);
-        sortMovies(sortedState);
+
+
+        // Call the applyAllFilters method with the obtained parameters
+        applyAllFilters(searchText, genre, rating, releaseYearStr);
     }
+
 
     public void sortBtnClicked(ActionEvent actionEvent) {
         sortMovies();
@@ -186,7 +190,7 @@ public class HomeController implements Initializable {
 
     public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear) {
         return movies.stream()
-                .filter(movie -> movie.getReleaseYear() >= startYear && movie.getReleaseYear() <= endYear)
+                .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
                 .collect(Collectors.toList());
     }
 }

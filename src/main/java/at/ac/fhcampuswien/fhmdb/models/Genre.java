@@ -20,5 +20,10 @@ public enum Genre {
     SPORT,
     THRILLER,
     WAR,
-    WESTERN
+    WESTERN;
+
+    public String getName() {
+        // Return the name of the enum constant
+        return this.name();
+    }
 }
