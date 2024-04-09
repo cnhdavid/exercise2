@@ -14,13 +14,15 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+// MovieAPI-Klasse für die Kommunikation mit der externen API
 public class MovieAPI {
     private final OkHttpClient client = new OkHttpClient();
     private final Gson gson = new Gson();
     private final String baseUrl = "https://prog2.fh-campuswien.ac.at/movies";
 
+    // Filme von der externen API abrufen
     public List<Movie> fetchMovies(String searchText, Object genre, String rating, String releaseYearStr) throws IOException {
-        // Parse releaseYearStr into an int if it's not empty
+        // releaseYearStr in einen Integer parsen, wenn es nicht leer ist
 
         String genreString = "";
         if (genre != null) {
@@ -29,7 +31,7 @@ public class MovieAPI {
 
         String url = constructUrl(searchText, genreString, rating, releaseYearStr);
 
-        // Logging the request URL for debugging purposes
+        // Anfordern der URL protokollieren (für Debugging-Zwecke)
         System.out.println("Request URL: " + url);
 
         Request request = new Request.Builder()
@@ -53,16 +55,16 @@ public class MovieAPI {
         }
     }
 
+    // URL für die Anfrage konstruieren
     public String constructUrl(String searchText, String genre, String rating, String releaseYear) throws IOException {
         searchText = searchText != null ? searchText : "";
         genre = genre != null ? genre : "";
-
 
         // URL-Encoding
         String encodedSearchText = URLEncoder.encode(searchText, "UTF-8");
         String encodedGenre = URLEncoder.encode(genre, "UTF-8");
 
-        // Construct the URL
+        // URL konstruieren
         String url = baseUrl;
         List<String> params = new ArrayList<>();
         if (!searchText.isEmpty()) {
@@ -74,7 +76,7 @@ public class MovieAPI {
         if (!rating.isEmpty()) {
             params.add("rating=" + rating);
         }
-        if ( !releaseYear.isEmpty()) {
+        if (!releaseYear.isEmpty()) {
             params.add("releaseYear=" + releaseYear);
         }
         if (!params.isEmpty()) {
@@ -82,4 +84,5 @@ public class MovieAPI {
         }
 
         return url;
-    }}
+    }
+}

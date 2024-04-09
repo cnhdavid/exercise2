@@ -1,5 +1,14 @@
 package at.ac.fhcampuswien.fhmdb;
 
+// Import-Anweisungen
+
+// Import-Anweisungen
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
@@ -15,12 +24,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-
+// Kommentare hinzugefügt
 public class HomeController implements Initializable {
+    // FXML-Elemente
     @FXML
     public JFXButton searchBtn;
 
@@ -36,24 +42,34 @@ public class HomeController implements Initializable {
     @FXML
     public JFXButton sortBtn;
 
-    public List<Movie> allMovies;
-    public TextField releaseYearField;
+    @FXML
     public TextField ratingFilterField;
 
-    protected ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
+    public TextField releaseYearField;
 
-    protected SortedState sortedState;
+    // Liste aller Filme
+    public List<Movie> allMovies;
+
+    // Liste der Filme, die im UI angezeigt werden
+    public ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
+
+    // Aktueller Sortierstatus
+    public SortedState sortedState;
+
+    // Instanz der MovieAPI-Klasse
     private final MovieAPI movieAPI = new MovieAPI();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        loadMovies();
-        initializeLayout();
+        loadMovies(); // Filme laden
+        initializeLayout(); // Layout initialisieren
     }
 
+    // Filme laden
     public void loadMovies() {
         try {
-            List<Movie> movies = movieAPI.fetchMovies("", "","", "");
+            // Filme von der API abrufen
+            List<Movie> movies = movieAPI.fetchMovies("", "", "", "");
             allMovies = movies;
             observableMovies.clear();
             observableMovies.addAll(movies);
@@ -63,16 +79,21 @@ public class HomeController implements Initializable {
             e.printStackTrace();
         }
     }
-    public void initializeLayout() {
-        movieListView.setItems(observableMovies);   // set the items of the listview to the observable list
-        movieListView.setCellFactory(movieListView -> new MovieCell()); // apply custom cells to the listview
 
-        Object[] genres = Genre.values();   // get all genres
-        genreComboBox.getItems().add("No filter");  // add "no filter" to the combobox
-        genreComboBox.getItems().addAll(genres);    // add all genres to the combobox
+    // Layout initialisieren
+    public void initializeLayout() {
+        // Filme der ListView hinzufügen
+        movieListView.setItems(observableMovies);
+        movieListView.setCellFactory(movieListView -> new MovieCell());
+
+        // Genres zur ComboBox hinzufügen
+        Object[] genres = Genre.values();
+        genreComboBox.getItems().add("No filter");
+        genreComboBox.getItems().addAll(genres);
         genreComboBox.setPromptText("Filter by Genre");
     }
 
+    // Filme sortieren
     public void sortMovies(){
         if (sortedState == SortedState.NONE || sortedState == SortedState.DESCENDING) {
             sortMovies(SortedState.ASCENDING);
@@ -80,19 +101,19 @@ public class HomeController implements Initializable {
             sortMovies(SortedState.DESCENDING);
         }
     }
-    // sort movies based on sortedState
-    // by default sorted state is NONE
-    // afterwards it switches between ascending and descending
+
+    // Filme sortieren (überladen)
     public void sortMovies(SortedState sortDirection) {
         if (sortDirection == SortedState.ASCENDING) {
-            observableMovies.sort(Comparator.comparing(Movie::getTitle));
+            observableMovies.sort(Comparator.comparing(Movie::getRating));
             sortedState = SortedState.ASCENDING;
         } else {
-            observableMovies.sort(Comparator.comparing(Movie::getTitle).reversed());
+            observableMovies.sort(Comparator.comparing(Movie::getRating).reversed());
             sortedState = SortedState.DESCENDING;
         }
     }
 
+    // Filme nach Suchbegriff filtern
     public List<Movie> filterByQuery(List<Movie> movies, String query){
         if(query == null || query.isEmpty()) return movies;
 
@@ -103,12 +124,13 @@ public class HomeController implements Initializable {
         return movies.stream()
                 .filter(Objects::nonNull)
                 .filter(movie ->
-                        movie.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                                movie.getDescription().toLowerCase().contains(query.toLowerCase())
+                        movie.getTitle().toLowerCase().contains(query.toLowerCase())
+                        //       movie.getDescription().toLowerCase().contains(query.toLowerCase())  // wurde nur auskommentiert, da das entfernen nicht in der Angabe stand
                 )
                 .toList();
     }
 
+    // Filme nach Genre filtern
     public List<Movie> filterByGenre(List<Movie> movies, Genre genre){
         if(genre == null) return movies;
 
@@ -122,6 +144,7 @@ public class HomeController implements Initializable {
                 .toList();
     }
 
+    // Filme nach Bewertung filtern
     public List<Movie> filterByRating(List<Movie> movies, String rating) {
         if (rating == null || rating.isEmpty()) return movies;
 
@@ -129,40 +152,46 @@ public class HomeController implements Initializable {
         try {
             ratingValue = Double.parseDouble(rating);
         } catch (NumberFormatException e) {
-            // Wenn das Rating keine gültige Zahl ist, gib die unveränderte Liste zurück
             return movies;
         }
 
+        boolean isDecimal = rating.contains(".");
+
         return movies.stream()
-                .filter(movie -> movie.getRating() == ratingValue)
+                .filter(movie -> {
+                    double movieRating = movie.getRating();
+                    if (isDecimal) {
+                        return movieRating >= ratingValue;
+                    } else {
+                        int firstDigit = (int) ratingValue;
+                        return movieRating >= firstDigit;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
+    // Alle Filter anwenden
     public void applyAllFilters(String searchQuery, Object genre, String rating, String releaseYearStr) {
         try {
-            // Rufe die Filme von der API ab
+            // Filme von der API abrufen
             List<Movie> movies = movieAPI.fetchMovies("", genre, rating, releaseYearStr);
-
-            // Filtere die Filme basierend auf dem Suchtext
             List<Movie> filteredMovies = filterByQuery(movies, searchQuery);
 
-            filteredMovies = filterByRating(filteredMovies, ratingFilterField.getText());
+            if (!rating.isEmpty()) {
+                filteredMovies = filterByRating(filteredMovies, rating);
+            }
 
-
-            // Aktualisiere die ObservableList mit den gefilterten Filmen
             observableMovies.clear();
             observableMovies.addAll(filteredMovies);
 
-            // Optional: Drucke die Anzahl der gefilterten Filme für Debugging-Zwecke
             System.out.println("Anzahl der gefilterten Filme: " + filteredMovies.size());
 
         } catch (IOException e) {
             System.err.println("Fehler beim Abrufen der Filme: " + e.getMessage());
-            // Handle den Fehler entsprechend deiner Anwendungslogik
         }
     }
 
-
+    // Event-Handler für Suchbutton-Klick
     public void searchBtnClicked(ActionEvent actionEvent) {
         String searchText = searchField.getText();
         String rating = ratingFilterField.getText();
@@ -176,17 +205,15 @@ public class HomeController implements Initializable {
             genre = selectedGenre;
         }
 
-
-
-        // Call the applyAllFilters method with the obtained parameters
         applyAllFilters(searchText, genre, rating, releaseYearStr);
     }
 
-
+    // Event-Handler für Sortierbutton-Klick
     public void sortBtnClicked(ActionEvent actionEvent) {
         sortMovies();
     }
 
+    // Filme in jedem Genre zählen
     public Map<Genre, Long> countMoviesInEachGenre(List<Movie> movies) {
         Map<Genre, Long> genreCounts = Arrays.stream(Genre.values())
                 .collect(Collectors.toMap(
@@ -199,7 +226,7 @@ public class HomeController implements Initializable {
         return genreCounts;
     }
 
-
+    // Den beliebtesten Schauspieler finden
     public String getMostPopularActor(List<Movie> movies) {
         return movies.stream()
                 .flatMap(movie -> movie.getMainCast().stream())
@@ -208,21 +235,24 @@ public class HomeController implements Initializable {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-    } //WORKS
+    }
 
+    // Längsten Filmtitel finden
     public int getLongestMovieTitle(List<Movie> movies) {
         return movies.stream()
                 .mapToInt(movie -> movie.getTitle().length())
                 .max()
                 .orElse(0);
-    } //WORKS
+    }
 
-        public long countMoviesFrom(List<Movie> movies, String director) {
-            return movies.stream()
-                    .filter(movie -> movie.getDirectors().contains(director))
-                    .count();
-        }
+    // Filme eines Regisseurs zählen
+    public long countMoviesFrom(List<Movie> movies, String director) {
+        return movies.stream()
+                .filter(movie -> movie.getDirectors().contains(director))
+                .count();
+    }
 
+    // Filme zwischen zwei Jahren erhalten
     public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear) {
         return movies.stream()
                 .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
