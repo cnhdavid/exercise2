@@ -93,7 +93,7 @@ public class MovieCell extends ListCell<Movie> {
             layout.setPadding(new Insets(10));
             layout.spacingProperty().set(10);
             layout.setAlignment(Pos.CENTER_LEFT);
-            layout.getChildren().addAll( detail, releaseYear,  genre, directors, writers, mainCast, rating);
+            layout.getChildren().addAll( title, detail, releaseYear,  genre, directors, writers, mainCast, rating);
             setGraphic(layout);
         }
     }
