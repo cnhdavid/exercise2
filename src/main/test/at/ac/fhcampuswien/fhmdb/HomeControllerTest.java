@@ -17,6 +17,7 @@ class HomeControllerTest {
 
 
     private static HomeController homeController;
+
     @BeforeAll
     static void init() {
         homeController = new HomeController();
@@ -51,6 +52,51 @@ class HomeControllerTest {
 
         // then
         assertEquals(homeController.observableMovies, actual);
+    }
+
+    @Test
+    public void testGetMostPopularActor() {
+        List<Movie> movies = Arrays.asList(
+                new Movie("Movie 1", "Description 1", Arrays.asList(Genre.ACTION, Genre.DRAMA),
+                        Arrays.asList("Actor 1", "Actor 2", "Actor 3"), "Director 1", 2000, 8.5),
+                new Movie("Movie 2", "Description 2", Arrays.asList(Genre.COMEDY),
+                        Arrays.asList("Actor 2", "Actor 3"), "Director 2", 2005, 7.5),
+                new Movie("Movie 3", "Description 3", Arrays.asList(Genre.DRAMA),
+                        Arrays.asList("Actor 1", "Actor 3"), "Director 1", 2010, 9.0)
+        );
+
+        String mostPopularActor = homeController.getMostPopularActor(movies);
+        assertEquals("Actor 3", mostPopularActor);
+    }
+
+    @Test
+    public void testGetLongestMovieTitle() {
+        List<Movie> movies = Arrays.asList(
+                new Movie("Avengers", "Description 1", null, null, null, 0, 0.0),
+                new Movie("Spider-Man: Far From Home", "Description 2", null, null, null, 0, 0.0),
+                new Movie("The Shawshank Redemption", "Description 3", null, null, null, 0, 0.0)
+        );
+
+        int longestTitleLength = homeController.getLongestMovieTitle(movies);
+        assertEquals(25, longestTitleLength);
+    }
+
+    @Test
+    public void testCountMoviesFrom() {
+        // Create a list of movies with different directors
+        List<Movie> movies = Arrays.asList(
+                new Movie("Movie 1", "", null, null, "Director A", 0, 0.0),
+                new Movie("Movie 2", "", null, null, "Director B", 0, 0.0),
+                new Movie("Movie 3", "", null, null, "Director A", 0, 0.0),
+                new Movie("Movie 4", "", null, null, "Director C", 0, 0.0),
+                new Movie("Movie 5", "", null, null, "Director A", 0, 0.0)
+        );
+
+        // Count the number of movies directed by "Director A"
+        long moviesDirectedByDirectorA = homeController.countMoviesFrom(movies, "Director A");
+
+        // Verify that the count is correct
+        assertEquals(3, moviesDirectedByDirectorA);
     }
 
 
@@ -94,6 +140,13 @@ class HomeControllerTest {
 
         // then
         assertEquals(homeController.allMovies, homeController.observableMovies);
+    }
+
+    @Test
+    public void testCountMoviesInEachGenre() {
+
+
+        // You can manually verify the output printed on the console
     }
 
 }
