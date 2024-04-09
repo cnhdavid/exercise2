@@ -122,18 +122,43 @@ public class HomeController implements Initializable {
                 .toList();
     }
 
+    public List<Movie> filterByRating(List<Movie> movies, String rating) {
+        if (rating == null || rating.isEmpty()) return movies;
+
+        double ratingValue;
+        try {
+            ratingValue = Double.parseDouble(rating);
+        } catch (NumberFormatException e) {
+            // Wenn das Rating keine gültige Zahl ist, gib die unveränderte Liste zurück
+            return movies;
+        }
+
+        return movies.stream()
+                .filter(movie -> movie.getRating() == ratingValue)
+                .collect(Collectors.toList());
+    }
+
     public void applyAllFilters(String searchQuery, Object genre, String rating, String releaseYearStr) {
         try {
-            List<Movie> movies = movieAPI.fetchMovies(searchQuery,  genre, rating, releaseYearStr);
+            // Rufe die Filme von der API ab
+            List<Movie> movies = movieAPI.fetchMovies("", genre, rating, releaseYearStr);
 
+            // Filtere die Filme basierend auf dem Suchtext
+            List<Movie> filteredMovies = filterByQuery(movies, searchQuery);
+
+            filteredMovies = filterByRating(filteredMovies, ratingFilterField.getText());
+
+
+            // Aktualisiere die ObservableList mit den gefilterten Filmen
             observableMovies.clear();
-            observableMovies.addAll(movies);
+            observableMovies.addAll(filteredMovies);
 
-            // Count movies in each genre and print the results
+            // Optional: Drucke die Anzahl der gefilterten Filme für Debugging-Zwecke
+            System.out.println("Anzahl der gefilterten Filme: " + filteredMovies.size());
 
         } catch (IOException e) {
-            System.err.println("Error fetching movies: " + e.getMessage());
-            // Handle the error or throw an exception as per your application's logic
+            System.err.println("Fehler beim Abrufen der Filme: " + e.getMessage());
+            // Handle den Fehler entsprechend deiner Anwendungslogik
         }
     }
 
