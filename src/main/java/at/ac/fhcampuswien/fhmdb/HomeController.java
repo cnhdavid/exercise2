@@ -155,7 +155,7 @@ public class HomeController implements Initializable {
         sortMovies();
     }
 
-    private void countMoviesInEachGenre(List<Movie> movies) {
+    public Map<Genre, Long> countMoviesInEachGenre(List<Movie> movies) {
         Map<Genre, Long> genreCounts = Arrays.stream(Genre.values())
                 .collect(Collectors.toMap(
                         genre -> genre,
@@ -163,7 +163,10 @@ public class HomeController implements Initializable {
                 ));
 
         genreCounts.forEach((genre, count) -> System.out.println(genre + ": " + count));
+
+        return genreCounts;
     }
+
 
     public String getMostPopularActor(List<Movie> movies) {
         return movies.stream()

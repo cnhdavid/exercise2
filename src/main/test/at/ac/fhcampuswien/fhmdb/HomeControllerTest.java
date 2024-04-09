@@ -30,7 +30,6 @@ class HomeControllerTest {
     }
 
 
-
     @Test
     void query_filter_with_null_movie_list_throws_exception(){
         // given
@@ -113,7 +112,7 @@ class HomeControllerTest {
         assertEquals(homeController.observableMovies, actual);
     }
 
-    /*
+
     @Test
     void genre_filter_returns_all_movies_containing_given_genre() {
         // given
@@ -121,14 +120,16 @@ class HomeControllerTest {
         Genre genre = Genre.DRAMA;
 
         // when
+        Map<Genre, Long> genreCounts = homeController.countMoviesInEachGenre(homeController.allMovies);
         List<Movie> actual = homeController.filterByGenre(homeController.observableMovies, genre);
 
         // then
-        int expectedCount = HomeController.countMoviesInEachGenre(homeController.allMovies, genre);
-        assertEquals(expectedCount, actual.size());
+        Long expectedCount = genreCounts.get(genre);
+        assertEquals(expectedCount, (long) actual.size());
     }
 
-     */
+
+
 
     @Test
     void no_filtering_ui_if_empty_query_or_no_genre_is_set() {
@@ -136,7 +137,7 @@ class HomeControllerTest {
         homeController.loadMovies();
 
         // when
-        homeController.applyAllFilters("", null, null,null);
+        homeController.applyAllFilters("", "", "","");
 
         // then
         assertEquals(homeController.allMovies, homeController.observableMovies);
