@@ -142,6 +142,31 @@ class HomeControllerTest {
         assertEquals(homeController.allMovies, homeController.observableMovies);
     }
 
+
+    @Test
+    public void testGetMoviesBetweenYears() {
+        // Create some sample movies
+        List<Movie> movies = Arrays.asList(
+                new Movie("Movie 1", "", null, null, "Director A", 2015, 0.0),
+                new Movie("Movie 2", "", null, null, "Director B", 2016, 0.0),
+                new Movie("Movie 3", "", null, null, "Director A", 2019, 0.0),
+                new Movie("Movie 4", "", null, null, "Director C", 2020, 0.0),
+                new Movie("Movie 5", "", null, null, "Director A", 2021, 0.0)
+        );
+
+        // Set the start and end years for filtering
+        int startYear = 2015;
+        int endYear = 2019;
+
+        // Call the method to get movies between the specified years
+        List<Movie> filteredMovies = new HomeController().getMoviesBetweenYears(movies, startYear, endYear);
+
+        // Check if the filteredMovies list contains the expected movies
+        assertEquals(3, filteredMovies.size()); // Expecting 3 movies between years 2005 and 2015
+
+        // You can further assert for specific movie titles or other properties if needed
+    }
+
     @Test
     public void testCountMoviesInEachGenre() {
 
