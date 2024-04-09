@@ -140,9 +140,16 @@ public class HomeController implements Initializable {
 
     public void searchBtnClicked(ActionEvent actionEvent) {
         String searchText = searchField.getText();
-        Object genre = (Genre) genreComboBox.getValue();
         String rating = ratingFilterField.getText();
         String releaseYearStr = releaseYearField.getText();
+        Object selectedGenre = genreComboBox.getValue();
+        Object genre = null;
+
+        if (selectedGenre instanceof String && "No Filter".equals(selectedGenre)) {
+            genre = null;
+        } else if (selectedGenre instanceof Genre) {
+            genre = selectedGenre;
+        }
 
 
 
