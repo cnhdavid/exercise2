@@ -6,10 +6,12 @@ package at.ac.fhcampuswien.fhmdb;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
@@ -21,11 +23,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 // Kommentare hinzugefügt
 public class HomeController implements Initializable {
+    private DatabaseManager databaseManager;
     // FXML-Elemente
     @FXML
     public JFXButton searchBtn;
@@ -58,11 +66,32 @@ public class HomeController implements Initializable {
 
     // Instanz der MovieAPI-Klasse
     private final MovieAPI movieAPI = new MovieAPI();
+    public Button watchlistBtn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadMovies(); // Filme laden
         initializeLayout(); // Layout initialisieren
+        try {
+            // Initialisiere den DatabaseManager
+            databaseManager = new DatabaseManager();
+            databaseManager.init();
+
+            // Überprüfe die Verbindung zur Datenbank
+            checkDatabaseConnection();
+
+            // Weitere Initialisierungsschritte hier...
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Behandle den Fehler angemessen
+        }
+    }
+    private void checkDatabaseConnection() {
+        if (databaseManager != null && databaseManager.getConnectionSource() != null) {
+            System.out.println("Datenbankverbindung hergestellt.");
+        } else {
+            System.err.println("Fehler beim Herstellen der Verbindung zur Datenbank.");
+        }
     }
 
     // Filme laden
@@ -174,7 +203,7 @@ public class HomeController implements Initializable {
     public void applyAllFilters(String searchQuery, Object genre, String rating, String releaseYearStr) {
         try {
             // Filme von der API abrufen
-            List<Movie> movies = movieAPI.fetchMovies("", genre, rating, releaseYearStr);
+            List<Movie> movies = movieAPI.fetchMovies(searchQuery, genre, rating, releaseYearStr);
             List<Movie> filteredMovies = filterByQuery(movies, searchQuery);
 
             if (!rating.isEmpty()) {
@@ -257,5 +286,31 @@ public class HomeController implements Initializable {
         return movies.stream()
                 .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
                 .collect(Collectors.toList());
+    }
+
+
+
+    @FXML
+    private void watchlistBtnClicked(ActionEvent event) {
+        try {
+            // Load the watchlist view FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("watchlist.fxml"));
+            Parent watchlistViewRoot = loader.load();
+
+            // Create a new scene with the loaded FXML root node
+            Scene watchlistScene = new Scene(watchlistViewRoot);
+
+            // Get the current stage (window)
+            Stage currentStage = (Stage) watchlistBtn.getScene().getWindow();
+
+            // Set the scene of the stage to the watchlist scene
+            currentStage.setScene(watchlistScene);
+
+            // Show the stage
+            currentStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle any potential errors (e.g., FXML file not found)
+        }
     }
 }

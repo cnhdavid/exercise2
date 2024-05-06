@@ -1,4 +1,23 @@
 package at.ac.fhcampuswien.fhmdb.database;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
+@DatabaseTable(tableName = "movies")
 public class MovieEntity {
+    @DatabaseField(generatedId = true)
+    private int id;
+
+    @DatabaseField
+    private String title;
+
+    @DatabaseField
+    private double rating;
+
+    @DatabaseField
+    private String releaseYear;
+
+    @DatabaseField
+    private String genres; // Genres als kommaseparierte Zeichenfolge
+
+    // Konstruktor, Getter und Setter
 }
