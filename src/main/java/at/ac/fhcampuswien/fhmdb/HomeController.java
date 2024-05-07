@@ -80,11 +80,11 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         try {
             loadMovies(); // Filme laden
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showErrorDialog("IO Error", "Error loading movies: " + e.getMessage());
+            e.printStackTrace();
         }
         initializeLayout(); // Layout initialisieren
         try {
@@ -97,7 +97,8 @@ public class HomeController implements Initializable {
 
             // Weitere Initialisierungsschritte hier...
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            showErrorDialog("SQL Error", "Error connecting to the database: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -144,6 +145,7 @@ public class HomeController implements Initializable {
         genreComboBox.getItems().addAll(genres);
         genreComboBox.setPromptText("Filter by Genre");
     }
+
 
     private final ClickEventHandler onAddToWatchlistClicked = (clickedItem) -> {
         watchlistRepository.addToWatchlist(new WatchlistMovieEntity((Movie) clickedItem));
@@ -259,7 +261,7 @@ public class HomeController implements Initializable {
 
     // Event-Handler für Suchbutton-Klick
     public void searchBtnClicked(ActionEvent actionEvent) {
-        String searchText = searchField.getText();
+        String searchText = searchField.getText().trim(); // Text ohne Leerzeichen am Anfang und am Ende
         String rating = ratingFilterField.getText();
         String releaseYearStr = releaseYearField.getText();
         Object selectedGenre = genreComboBox.getValue();
@@ -271,6 +273,14 @@ public class HomeController implements Initializable {
             genre = selectedGenre;
         }
 
+        // Überprüfen, ob das Suchfeld leer ist
+        if (searchText.isEmpty()) {
+            // Wenn das Suchfeld leer ist, zeige eine Fehlermeldung an
+            showErrorDialog("Leeres Suchfeld", "Bitte geben Sie einen Suchbegriff ein.");
+            return; // Beende die Methode vorzeitig, um zu verhindern, dass der Filtervorgang ausgeführt wird
+        }
+
+        // Wenn das Suchfeld nicht leer ist, wende alle Filter an
         applyAllFilters(searchText, genre, rating, releaseYearStr);
     }
 
@@ -358,4 +368,7 @@ public class HomeController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+
+
 }
