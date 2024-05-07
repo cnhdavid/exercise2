@@ -1,16 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="at.ac.fhcampuswien.fhmdb.WatchlistController">
-
-    <!-- Add components for displaying watchlist content -->
-    <!-- For example: TableView to display movies in the watchlist -->
-
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.text.Font?>
+<?import com.jfoenix.controls.JFXListView?>
+<VBox prefHeight="331.0" prefWidth="570.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.fhcampuswien.fhmdb.WatchlistController">
+    <Label text="Watchlist" style="-fx-background-color: F5C518;">
+        <font>
+            <Font name="Calibri Bold" size="24.0" />
+        </font>
+        <padding>
+            <Insets left="10.0" right="10.0" top="5.0" />
+        </padding>
+    </Label>
+    <JFXListView fx:id="watchlistListView" styleClass="background-black" style="-fx-background-color: black;" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
+    <VBox.margin>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </VBox.margin>
+    <HBox>
+        <JFXButton fx:id="removeBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Remove from Watchlist" />
+        <Region HBox.hgrow="ALWAYS"/> <!-- Spacer -->
+        <JFXButton fx:id="homeBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Back to Home" onAction="#returnToHomeScreen" />
+    </HBox>
 </VBox>
