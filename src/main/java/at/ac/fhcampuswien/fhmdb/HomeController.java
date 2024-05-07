@@ -301,9 +301,6 @@ public class HomeController implements Initializable {
                 .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
                 .collect(Collectors.toList());
     }
-
-
-
     @FXML
     private void watchlistBtnClicked(ActionEvent event) {
         try {
@@ -316,7 +313,7 @@ public class HomeController implements Initializable {
 
             // Get the current stage (window)
             Stage currentStage = (Stage) watchlistBtn.getScene().getWindow();
-            currentStage.setWidth(820);
+            currentStage.setWidth(850);
             currentStage.setHeight(620);
 
             // Set the scene of the stage to the watchlist scene

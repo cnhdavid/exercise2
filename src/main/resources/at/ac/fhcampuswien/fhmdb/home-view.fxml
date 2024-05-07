@@ -36,7 +36,7 @@
          <TextField fx:id="releaseYearField" promptText="Filter by Release Year" />
          <TextField fx:id="ratingFilterField" promptText="Enter rating (0-10)" />
          <JFXButton fx:id="searchBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Filter" onAction="#searchBtnClicked"/>
-         <Button fx:id="watchlistBtn" text="Watchlist" onAction="#watchlistBtnClicked"/>
+         <Button fx:id="watchlistBtn" styleClass="background-yellow" stylesheets="@styles.css" text="To Watchlist" onAction="#watchlistBtnClicked"/>
       </children>
       <VBox.margin>
          <Insets />

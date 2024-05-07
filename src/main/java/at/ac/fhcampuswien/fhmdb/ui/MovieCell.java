@@ -1,8 +1,10 @@
 package at.ac.fhcampuswien.fhmdb.ui;
 
+import at.ac.fhcampuswien.fhmdb.interfaces.ClickEventHandler;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
@@ -24,6 +26,10 @@ public class MovieCell extends ListCell<Movie> {
     private final Label rating = new Label();
     private final Label releaseYear = new Label();
     private final VBox layout = new VBox(title,releaseYear, detail, genre, directors, writers, mainCast, rating);
+    private Button watchlistBtn = new Button("Watchlist");
+    private Button removeBtn = new Button("Remove");
+
+
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
@@ -35,7 +41,6 @@ public class MovieCell extends ListCell<Movie> {
         } else {
             // Clear existing children
             layout.getChildren().clear();
-
             this.getStyleClass().add("movie-cell");
             title.setText(movie.getTitle());
             detail.setText(
