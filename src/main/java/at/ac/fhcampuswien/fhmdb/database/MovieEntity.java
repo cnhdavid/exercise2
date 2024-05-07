@@ -18,7 +18,7 @@ public class MovieEntity {
     @DatabaseField
     private String description;
     @DatabaseField
-    private List<Genre> genres;
+    private String genres;
     @DatabaseField
     private int releaseYear;
     @DatabaseField
@@ -36,7 +36,7 @@ public class MovieEntity {
         id = g.getId();
         title = g.getTitle();
         description = g.getDescription();
-        genres = g.getGenres();
+        genres = genresToString(g.getGenres());
         releaseYear = Integer.parseInt(g.getReleaseYear());
         imgUrl = g.getImgUrl();
         lengthInMinutes = g.getLengthInMinutes();
@@ -52,9 +52,11 @@ public class MovieEntity {
     public String getDescription() {
         return description;
     }
-    public List<Genre> getGenres() {
+    public String getGenres() {
+
         return genres;
     }
+
     public int getReleaseYear() {
         return releaseYear;
     }

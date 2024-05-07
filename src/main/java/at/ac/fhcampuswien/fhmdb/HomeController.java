@@ -6,13 +6,17 @@ package at.ac.fhcampuswien.fhmdb;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
+import at.ac.fhcampuswien.fhmdb.database.WatchlistMovieEntity;
+import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
 import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
+import at.ac.fhcampuswien.fhmdb.interfaces.ClickEventHandler;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
@@ -36,6 +40,7 @@ import javafx.stage.Stage;
 // Kommentare hinzugefügt
 public class HomeController implements Initializable {
     private DatabaseManager databaseManager;
+
     // FXML-Elemente
     @FXML
     public JFXButton searchBtn;
@@ -56,6 +61,7 @@ public class HomeController implements Initializable {
     public TextField ratingFilterField;
 
     public TextField releaseYearField;
+    private WatchlistRepository watchlistRepository;
 
     // Liste aller Filme
     public List<Movie> allMovies;
@@ -70,8 +76,11 @@ public class HomeController implements Initializable {
     private MovieAPI movieAPI = new MovieAPI();
     public Button watchlistBtn;
 
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         try {
             loadMovies(); // Filme laden
         } catch (IOException e) {
@@ -81,16 +90,14 @@ public class HomeController implements Initializable {
         try {
             // Initialisiere den DatabaseManager
             databaseManager = new DatabaseManager();
-            databaseManager.init();
+            DatabaseManager.createConnectSource();
 
             // Überprüfe die Verbindung zur Datenbank
             checkDatabaseConnection();
 
             // Weitere Initialisierungsschritte hier...
-        } catch (DatabaseException e) {
-            // Behandle den Fehler angemessen
-            showErrorDialog("Database Error", "Error initializing database connection: " + e.getMessage());
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -123,15 +130,31 @@ public class HomeController implements Initializable {
 
     // Layout initialisieren
     public void initializeLayout() {
+        watchlistRepository = new WatchlistRepository();
         // Filme der ListView hinzufügen
         movieListView.setItems(observableMovies);
-        movieListView.setCellFactory(movieListView -> new MovieCell());
+
+        movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked,this)); // apply custom cells to the listview
+
+
 
         // Genres zur ComboBox hinzufügen
         Object[] genres = Genre.values();
         genreComboBox.getItems().add("No filter");
         genreComboBox.getItems().addAll(genres);
         genreComboBox.setPromptText("Filter by Genre");
+    }
+
+    private final ClickEventHandler onAddToWatchlistClicked = (clickedItem) -> {
+        watchlistRepository.addToWatchlist(new WatchlistMovieEntity((Movie) clickedItem));
+
+    };
+    public void setMovies(List<Movie> movies) {
+        allMovies = movies;
+    }
+    public void setMovieList(List<Movie> movies) {
+        observableMovies.clear();
+        observableMovies.addAll(movies);
     }
 
     // Filme sortieren

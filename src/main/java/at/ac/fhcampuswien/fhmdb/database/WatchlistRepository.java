@@ -28,6 +28,7 @@ public class WatchlistRepository {
     }
     public int addToWatchlist(WatchlistMovieEntity movie) throws SQLException {
         if(this.isInWatchlist(movie.getId())) return 0;
+        System.out.println(movie);
         return watchlistDao.create(movie);
     }
     public boolean isInWatchlist (String id) throws SQLException {

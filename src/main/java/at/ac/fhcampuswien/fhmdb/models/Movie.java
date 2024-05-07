@@ -12,7 +12,7 @@ import java.util.List;
 public class Movie {
     private String id;
     private String title;
-    private List<Genre> genres;
+    private final List<Genre> genres;
     private final String releaseYear;
     private String description;
     private String imgUrl;
@@ -42,11 +42,18 @@ public class Movie {
         this.id=movieEntity.getId();
         this.title=movieEntity.getTitle();
         this.description=movieEntity.getDescription();
-        this.genres=movieEntity.getGenres();
+        this.genres=stringToGenres(movieEntity.getGenres());
         this.releaseYear= String.valueOf(movieEntity.getReleaseYear());
         this.imgUrl=movieEntity.getImgUrl();
         this.lengthInMinutes=movieEntity.getLengthInMinutes();
         this.rating=movieEntity.getRating();
+    }
+
+    private List<Genre> stringToGenres(String string){
+        List<String> list = List.of(string.substring(1,string.length()-1).split(", "));
+        List<Genre> genres = new ArrayList<>();
+        for(String s : list) genres.add(Genre.valueOf(s));
+        return genres;
     }
 
     @Override
