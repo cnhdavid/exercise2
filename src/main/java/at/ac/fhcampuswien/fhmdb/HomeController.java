@@ -336,7 +336,7 @@ public class HomeController implements Initializable {
 
             // Get the current stage (window)
             Stage currentStage = (Stage) watchlistBtn.getScene().getWindow();
-            currentStage.setWidth(850);
+            currentStage.setWidth(950);
             currentStage.setHeight(620);
 
             // Set the scene of the stage to the watchlist scene

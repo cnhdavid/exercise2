@@ -70,7 +70,7 @@ public class WatchlistController implements Initializable {
 
             // Get the current stage (window) from the event source
             Stage currentStage = (Stage) homeBtn.getScene().getWindow();
-            currentStage.setWidth(890);
+            currentStage.setWidth(950);
             currentStage.setHeight(620);
 
             // Set the root of the current scene to the home view root

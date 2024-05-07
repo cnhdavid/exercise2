@@ -109,6 +109,8 @@
                 <configuration>
                     <includes>
                         <include>HomeControllerTest.java</include>
+                        <include>MovieApiExceptionTest.java</include>
+                        <include>DatabaseExceptionTest.java</include>
                     </includes>
                 </configuration>
             </plugin>
