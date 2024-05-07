@@ -21,8 +21,10 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
     private final Label detail = new Label();
     private final Label genre = new Label();
     private final JFXButton removeBtn = new JFXButton("Remove");
+
     private final HBox buttons = new HBox(removeBtn);
     private final VBox layout = new VBox(title, detail, genre, buttons);
+
 
     public WatchlistMovieCell(ClickEventHandler removeFromWatchlist) {
         super();
@@ -52,6 +54,7 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
                 throw new RuntimeException(e);
             }
         });
+
     }
 
     @Override
@@ -71,11 +74,15 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
             );
 
             String genres = movie.getGenres();
-
-
             genre.setText(genres);
 
             setGraphic(layout);
         }
+    }
+
+    private Label getDescription() {
+        Label descriptionLabel = new Label(detail.getText());
+        descriptionLabel.getStyleClass().add("text-white");
+        return descriptionLabel;
     }
 }

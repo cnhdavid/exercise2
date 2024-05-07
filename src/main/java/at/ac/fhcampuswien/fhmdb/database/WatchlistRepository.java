@@ -28,8 +28,11 @@ public class WatchlistRepository {
     }
     public int addToWatchlist(WatchlistMovieEntity movie) throws SQLException {
         if(this.isInWatchlist(movie.getId())) return 0;
-        System.out.println(movie);
-        return watchlistDao.create(movie);
+        else {
+            System.out.println(movie);
+            return watchlistDao.create(movie);
+        }
+
     }
     public boolean isInWatchlist (String id) throws SQLException {
         for(WatchlistMovieEntity m : getWatchlist()) if(m.getId() == id) return true;
