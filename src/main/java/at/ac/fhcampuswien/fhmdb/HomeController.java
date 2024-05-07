@@ -165,7 +165,7 @@ public class HomeController implements Initializable {
         return movies.stream()
                 .filter(Objects::nonNull)
                 .filter(movie ->
-                        movie.getTitle().toLowerCase().contains(query.toLowerCase())
+                                movie.getTitle().toLowerCase().contains(query.toLowerCase())
                         //       movie.getDescription().toLowerCase().contains(query.toLowerCase())  // wurde nur auskommentiert, da das entfernen nicht in der Angabe stand
                 )
                 .toList();
@@ -336,4 +336,3 @@ public class HomeController implements Initializable {
         alert.showAndWait();
     }
 }
-

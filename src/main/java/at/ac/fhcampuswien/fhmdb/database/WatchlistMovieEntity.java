@@ -1,38 +1,30 @@
 package at.ac.fhcampuswien.fhmdb.database;
 
+import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "watchlist")
-public class WatchlistMovieEntity {
-    @DatabaseField(generatedId = true)
-    private int id;
+import java.util.ArrayList;
+import java.util.List;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private MovieEntity movie;
 
-    // Konstruktor, Getter und Setter
-    public WatchlistMovieEntity() {
-        // Default-Konstruktor benötigt für ORMLite
+public class WatchlistMovieEntity extends MovieEntity {
+    long dbId;
+
+    String id;
+
+    public WatchlistMovieEntity(){
+
+    }
+    public WatchlistMovieEntity(Movie m){
+        super(m);
     }
 
-    public WatchlistMovieEntity(MovieEntity movie) {
-        this.movie = movie;
+    public static List<Movie> watchlistToMovies(List<WatchlistMovieEntity> watchlistMovieEntities){
+        List<Movie> movies = new ArrayList<>();
+        for(WatchlistMovieEntity m : watchlistMovieEntities) movies.add(new Movie(m));
+        return movies;
     }
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public MovieEntity getMovie() {
-        return movie;
-    }
-
-    public void setMovie(MovieEntity movie) {
-        this.movie = movie;
-    }
 }

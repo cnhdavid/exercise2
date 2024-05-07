@@ -2,6 +2,7 @@ package at.ac.fhcampuswien.fhmdb.ui;
 
 import at.ac.fhcampuswien.fhmdb.interfaces.ClickEventHandler;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
+import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -28,6 +29,7 @@ public class MovieCell extends ListCell<Movie> {
     private final VBox layout = new VBox(title,releaseYear, detail, genre, directors, writers, mainCast, rating);
     private Button watchlistBtn = new Button("Watchlist");
     private Button removeBtn = new Button("Remove");
+    private final JFXButton detailBtn = new JFXButton("Show Details");
 
 
 

@@ -1,9 +1,11 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.database.MovieEntity;
 import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,6 +22,11 @@ public class Movie {
     private List<String> mainCast;
     private double rating;
 
+    @Override
+    public String toString() {
+        return this.id;
+    }
+
 
     public Movie(String title, String description, List<Genre> genres, List<String> mainCast, String director, int releaseYear, double rating) {
         this.title = title;
@@ -29,6 +36,17 @@ public class Movie {
         this.directors = Collections.singletonList(director);
         this.releaseYear = String.valueOf(releaseYear);
         this.rating = rating;
+    }
+
+    public Movie(MovieEntity movieEntity){
+        this.id=movieEntity.getId();
+        this.title=movieEntity.getTitle();
+        this.description=movieEntity.getDescription();
+        this.genres=movieEntity.getGenres();
+        this.releaseYear= String.valueOf(movieEntity.getReleaseYear());
+        this.imgUrl=movieEntity.getImgUrl();
+        this.lengthInMinutes=movieEntity.getLengthInMinutes();
+        this.rating=movieEntity.getRating();
     }
 
     @Override
@@ -60,17 +78,47 @@ public class Movie {
         return mainCast;
     }
 
-    // Getter-Methode für director hinzugefügt
     public List<String> getDirector() {
-        return this.directors;
+        return directors;
     }
 
-    // Getter-Methode für releaseYear hinzugefügt
     public String getReleaseYear() {
         return releaseYear;
     }
 
+    public String getImgUrl() {
+        return imgUrl;
+    }
 
+    public int getLengthInMinutes() {
+        return lengthInMinutes;
+    }
+
+    public List getDirectors() {
+        return directors;
+    }
+
+    public List getWriters() {
+        return  writers;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+    public String getId() {
+        return id;
+    }
+    public static List<MovieEntity> fromMovies(List<Movie> movies) {
+        List<MovieEntity> movieEntities = new ArrayList<>();
+        for (Movie m : movies) movieEntities.add(new MovieEntity(m));
+
+        return movieEntities;
+    }
+    public static List<Movie> toMovies(List<MovieEntity> movieEntities) {
+        List<Movie> movies = new ArrayList<>();
+        for(MovieEntity m : movieEntities) movies.add(new Movie(m));
+        return movies;
+    }
     public static List<Movie> initializeMovies() throws IOException, IOException, MovieApiException {
         MovieAPI movieAPI = new MovieAPI();
 
@@ -78,24 +126,5 @@ public class Movie {
 
         return movies;
     }
-
-    public String getImgUrl() {
-        return this.imgUrl;
-    }
-
-    public int getLengthInMinutes() {
-        return this.lengthInMinutes;
-    }
-
-    public List getDirectors() {
-        return this.directors;
-    }
-
-    public List getWriters() {
-        return  this.writers;
-    }
-
-    public double getRating() {
-        return this.rating;
-    }
 }
+
