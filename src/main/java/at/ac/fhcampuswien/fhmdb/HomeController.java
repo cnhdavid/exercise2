@@ -2,8 +2,6 @@ package at.ac.fhcampuswien.fhmdb;
 
 // Import-Anweisungen
 
-// Import-Anweisungen
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -60,7 +58,12 @@ public class HomeController implements Initializable {
     @FXML
     public TextField ratingFilterField;
 
+    @FXML
     public TextField releaseYearField;
+
+    @FXML
+    private Button watchlistBtn;
+
     private WatchlistRepository watchlistRepository;
 
     // Liste aller Filme
@@ -73,10 +76,7 @@ public class HomeController implements Initializable {
     public SortedState sortedState;
 
     // Instanz der MovieAPI-Klasse
-    private MovieAPI movieAPI = new MovieAPI();
-    public Button watchlistBtn;
-
-
+    private final MovieAPI movieAPI = new MovieAPI();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -118,7 +118,7 @@ public class HomeController implements Initializable {
             allMovies = movies;
             observableMovies.clear();
             observableMovies.addAll(movies);
-            sortedState = sortedState.NONE;
+            sortedState = SortedState.NONE;
 
         } catch (IOException e) {
             showErrorDialog("IO Error", "Error fetching movies from API: " + e.getMessage());
@@ -135,9 +135,7 @@ public class HomeController implements Initializable {
         // Filme der ListView hinzufügen
         movieListView.setItems(observableMovies);
 
-        movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked,this)); // apply custom cells to the listview
-
-
+        movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked, this)); // apply custom cells to the listview
 
         // Genres zur ComboBox hinzufügen
         Object[] genres = Genre.values();
@@ -146,21 +144,12 @@ public class HomeController implements Initializable {
         genreComboBox.setPromptText("Filter by Genre");
     }
 
-
     private final ClickEventHandler onAddToWatchlistClicked = (clickedItem) -> {
         watchlistRepository.addToWatchlist(new WatchlistMovieEntity((Movie) clickedItem));
-
     };
-    public void setMovies(List<Movie> movies) {
-        allMovies = movies;
-    }
-    public void setMovieList(List<Movie> movies) {
-        observableMovies.clear();
-        observableMovies.addAll(movies);
-    }
 
     // Filme sortieren
-    public void sortMovies(){
+    public void sortMovies() {
         if (sortedState == SortedState.NONE || sortedState == SortedState.DESCENDING) {
             sortMovies(SortedState.ASCENDING);
         } else if (sortedState == SortedState.ASCENDING) {
@@ -179,84 +168,13 @@ public class HomeController implements Initializable {
         }
     }
 
-    // Filme nach Suchbegriff filtern
-    public List<Movie> filterByQuery(List<Movie> movies, String query){
-        if(query == null || query.isEmpty()) return movies;
-
-        if(movies == null) {
-            throw new IllegalArgumentException("movies must not be null");
-        }
-
-        return movies.stream()
-                .filter(Objects::nonNull)
-                .filter(movie ->
-                                movie.getTitle().toLowerCase().contains(query.toLowerCase())
-                        //       movie.getDescription().toLowerCase().contains(query.toLowerCase())  // wurde nur auskommentiert, da das entfernen nicht in der Angabe stand
-                )
-                .toList();
-    }
-
-    // Filme nach Genre filtern
-    public List<Movie> filterByGenre(List<Movie> movies, Genre genre){
-        if(genre == null) return movies;
-
-        if(movies == null) {
-            throw new IllegalArgumentException("movies must not be null");
-        }
-
-        return movies.stream()
-                .filter(Objects::nonNull)
-                .filter(movie -> movie.getGenres().contains(genre))
-                .toList();
-    }
-
-    // Filme nach Bewertung filtern
-    public List<Movie> filterByRating(List<Movie> movies, String rating) {
-        if (rating == null || rating.isEmpty()) return movies;
-
-        double ratingValue;
-        try {
-            ratingValue = Double.parseDouble(rating);
-        } catch (NumberFormatException e) {
-            return movies;
-        }
-
-        boolean isDecimal = rating.contains(".");
-
-        return movies.stream()
-                .filter(movie -> {
-                    double movieRating = movie.getRating();
-                    if (isDecimal) {
-                        return movieRating >= ratingValue;
-                    } else {
-                        int firstDigit = (int) ratingValue;
-                        return movieRating >= firstDigit;
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    // Alle Filter anwenden
-    public void applyAllFilters(String searchQuery, Object genre, String rating, String releaseYearStr) {
-        try {
-            // Filme von der API abrufen
-            List<Movie> movies = movieAPI.fetchMovies(searchQuery, genre, rating, releaseYearStr);
-            List<Movie> filteredMovies = filterByQuery(movies, searchQuery);
-
-            if (!rating.isEmpty()) {
-                filteredMovies = filterByRating(filteredMovies, rating);
-            }
-
-            observableMovies.clear();
-            observableMovies.addAll(filteredMovies);
-
-            System.out.println("Anzahl der gefilterten Filme: " + filteredMovies.size());
-
-        } catch (IOException e) {
-            System.err.println("Fehler beim Abrufen der Filme: " + e.getMessage());
-        } catch (MovieApiException e) {
-            throw new RuntimeException(e);
-        }
+    // Methode zum Anzeigen von Fehlermeldungen im UI
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     // Event-Handler für Suchbutton-Klick
@@ -289,51 +207,72 @@ public class HomeController implements Initializable {
         sortMovies();
     }
 
-    // Filme in jedem Genre zählen
-    public Map<Genre, Long> countMoviesInEachGenre(List<Movie> movies) {
-        Map<Genre, Long> genreCounts = Arrays.stream(Genre.values())
-                .collect(Collectors.toMap(
-                        genre -> genre,
-                        genre -> movies.stream().filter(movie -> movie.getGenres().contains(genre)).count()
-                ));
+    // Alle Filter anwenden
+    public void applyAllFilters(String searchQuery, Object genre, String rating, String releaseYearStr) {
+        try {
+            // Filme von der API abrufen
+            List<Movie> movies = movieAPI.fetchMovies(searchQuery, genre, rating, releaseYearStr);
+            List<Movie> filteredMovies = filterByQuery(movies, searchQuery);
 
-        genreCounts.forEach((genre, count) -> System.out.println(genre + ": " + count));
+            if (!rating.isEmpty()) {
+                filteredMovies = filterByRating(filteredMovies, rating);
+            }
 
-        return genreCounts;
+            observableMovies.clear();
+            observableMovies.addAll(filteredMovies);
+
+            System.out.println("Anzahl der gefilterten Filme: " + filteredMovies.size());
+
+        } catch (IOException e) {
+            System.err.println("Fehler beim Abrufen der Filme: " + e.getMessage());
+        } catch (MovieApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    // Den beliebtesten Schauspieler finden
-    public String getMostPopularActor(List<Movie> movies) {
+    // Filme nach Suchbegriff filtern
+    public List<Movie> filterByQuery(List<Movie> movies, String query) {
+        if (query == null || query.isEmpty()) return movies;
+
+        if (movies == null) {
+            throw new IllegalArgumentException("movies must not be null");
+        }
+
         return movies.stream()
-                .flatMap(movie -> movie.getMainCast().stream())
-                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
+                .filter(Objects::nonNull)
+                .filter(movie ->
+                                movie.getTitle().toLowerCase().contains(query.toLowerCase())
+                        //       movie.getDescription().toLowerCase().contains(query.toLowerCase())  // wurde nur auskommentiert, da das entfernen nicht in der Angabe stand
+                )
+                .toList();
     }
 
-    // Längsten Filmtitel finden
-    public int getLongestMovieTitle(List<Movie> movies) {
-        return movies.stream()
-                .mapToInt(movie -> movie.getTitle().length())
-                .max()
-                .orElse(0);
-    }
+    // Filme nach Bewertung filtern
+    public List<Movie> filterByRating(List<Movie> movies, String rating) {
+        if (rating == null || rating.isEmpty()) return movies;
 
-    // Filme eines Regisseurs zählen
-    public long countMoviesFrom(List<Movie> movies, String director) {
-        return movies.stream()
-                .filter(movie -> movie.getDirectors().contains(director))
-                .count();
-    }
+        double ratingValue;
+        try {
+            ratingValue = Double.parseDouble(rating);
+        } catch (NumberFormatException e) {
+            return movies;
+        }
 
-    // Filme zwischen zwei Jahren erhalten
-    public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear) {
+        boolean isDecimal = rating.contains(".");
+
         return movies.stream()
-                .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
+                .filter(movie -> {
+                    double movieRating = movie.getRating();
+                    if (isDecimal) {
+                        return movieRating >= ratingValue;
+                    } else {
+                        int firstDigit = (int) ratingValue;
+                        return movieRating >= firstDigit;
+                    }
+                })
                 .collect(Collectors.toList());
     }
+
     @FXML
     private void watchlistBtnClicked(ActionEvent event) {
         try {
@@ -360,15 +299,17 @@ public class HomeController implements Initializable {
         }
     }
 
-    // Methode zum Anzeigen von Fehlermeldungen im UI
-    private void showErrorDialog(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    // Filme eines Regisseurs zählen
+    public long countMoviesFrom(List<Movie> movies, String director) {
+        return movies.stream()
+                .filter(movie -> movie.getDirectors().contains(director))
+                .count();
     }
 
-
-
+    // Filme zwischen zwei Jahren erhalten
+    public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear) {
+        return movies.stream()
+                .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
+                .collect(Collectors.toList());
+    }
 }

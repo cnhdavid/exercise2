@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
+// Zelle zur Darstellung eines Films in der Benutzeroberfläche
 public class MovieCell extends ListCell<Movie> {
     private final Label title = new Label();
     private final Label detail = new Label();
@@ -27,10 +28,10 @@ public class MovieCell extends ListCell<Movie> {
     private final VBox layout = new VBox(title, detail, genre, buttons);
     private boolean collapsedDetails = true;
 
-
+    // Konstruktor für die MovieCell
     public MovieCell(ClickEventHandler addToWatchlist, HomeController homeController) {
         super();
-        // color scheme
+        // Farbschema für die Benutzeroberfläche
         detailBtn.setStyle("-fx-background-color: #f5c518;");
         title.getStyleClass().add("text-yellow");
         detail.getStyleClass().add("text-white");
@@ -39,8 +40,7 @@ public class MovieCell extends ListCell<Movie> {
         layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
         watchlistBtn.setStyle("-fx-background-color: #f5c518;");
 
-        // layout
-        //detailBtn.setAlignment(Pos.TOP_RIGHT);
+        // Layouteinstellungen
         title.fontProperty().set(title.getFont().font(20));
         detail.setWrapText(true);
         layout.setPadding(new Insets(10));
@@ -50,8 +50,7 @@ public class MovieCell extends ListCell<Movie> {
         buttons.spacingProperty().set(10);
         buttons.setAlignment(Pos.TOP_RIGHT);
 
-
-
+        // Ereignishandler für den Detail-Button
         detailBtn.setOnMouseClicked(mouseEvent -> {
             if (collapsedDetails) {
                 layout.getChildren().add(getDetails());
@@ -65,23 +64,22 @@ public class MovieCell extends ListCell<Movie> {
             setGraphic(layout);
         });
 
+        // Ereignishandler für den Watchlist-Button
         watchlistBtn.setOnMouseClicked(mouseEvent -> {
             try {
                 addToWatchlist.onClick(getItem());
-
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
+    // Methode zur Erstellung der Detailansicht
     private VBox getDetails() {
         VBox details = new VBox();
         Label releaseYear = new Label("Release Year: " + getItem().getReleaseYear());
         Label length = new Label("Length: " + getItem().getLengthInMinutes() + " minutes");
         Label rating = new Label("Rating: " + getItem().getRating() + "/10");
-
-
         Label directors = new Label("Directors: " + String.join(", ", getItem().getDirectors()));
         Label writers = new Label("Writers: " + String.join(", ", getItem().getWriters()));
         Label mainCast = new Label("Main Cast: " + String.join(", ", getItem().getMainCast()));
@@ -101,6 +99,8 @@ public class MovieCell extends ListCell<Movie> {
         details.getChildren().add(mainCast);
         return details;
     }
+
+    // Überschriebene Methode zum Aktualisieren der Zelleninhalte
     @Override
     protected void updateItem(Movie movie, boolean empty) {
         super.updateItem(movie, empty);
@@ -123,11 +123,8 @@ public class MovieCell extends ListCell<Movie> {
                     .collect(Collectors.joining(", "));
             genre.setText(genres);
 
-            //detail.setMaxWidth(this.getScene().getWidth() - 30);
             detail.setMaxWidth(860);
-
             setGraphic(layout);
         }
     }
 }
-

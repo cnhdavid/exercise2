@@ -7,24 +7,27 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// Klasse zur Repräsentation von Filmen in der Watchlist
 public class WatchlistMovieEntity extends MovieEntity {
+    // Felder für die Datenbank-ID und die ID des Films
+    // (wenn diese Felder nicht benötigt werden, können sie entfernt werden)
     long dbId;
-
     String id;
 
-    public WatchlistMovieEntity(){
+    // Standardkonstruktor
+    public WatchlistMovieEntity() {
 
     }
-    public WatchlistMovieEntity(Movie m){
+
+    // Konstruktor, der ein Movie-Objekt entgegennimmt und die Werte in die entsprechenden Felder setzt
+    public WatchlistMovieEntity(Movie m) {
         super(m);
     }
 
-    public static List<Movie> watchlistToMovies(List<WatchlistMovieEntity> watchlistMovieEntities){
+    // Methode zur Konvertierung einer Liste von WatchlistMovieEntity-Objekten in eine Liste von Movie-Objekten
+    public static List<Movie> watchlistToMovies(List<WatchlistMovieEntity> watchlistMovieEntities) {
         List<Movie> movies = new ArrayList<>();
-        for(WatchlistMovieEntity m : watchlistMovieEntities) movies.add(new Movie(m));
+        for (WatchlistMovieEntity m : watchlistMovieEntities) movies.add(new Movie(m));
         return movies;
     }
-
-
 }
