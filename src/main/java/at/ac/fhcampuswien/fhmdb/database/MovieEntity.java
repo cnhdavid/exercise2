@@ -93,4 +93,9 @@ public class MovieEntity {
         return getTitle() + " - " + getDescription();
     }
 
+
+
+
+
+
 }

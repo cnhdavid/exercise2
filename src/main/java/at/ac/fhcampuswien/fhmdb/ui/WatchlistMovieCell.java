@@ -21,9 +21,11 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
     private final Label detail = new Label();
     private final Label genre = new Label();
     private final JFXButton removeBtn = new JFXButton("Remove");
+    private final JFXButton detailBtn = new JFXButton("Show Details");
 
-    private final HBox buttons = new HBox(removeBtn);
+    private final HBox buttons = new HBox(removeBtn, detailBtn);
     private final VBox layout = new VBox(title, detail, genre, buttons);
+    private boolean collapsedDetails = true;
 
 
     public WatchlistMovieCell(ClickEventHandler removeFromWatchlist) {
@@ -46,6 +48,20 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
         buttons.setPadding(new Insets(10));
         buttons.setSpacing(10);
         buttons.setAlignment(Pos.TOP_RIGHT);
+
+        detailBtn.setOnMouseClicked(mouseEvent -> {
+            if (collapsedDetails) {
+                layout.getChildren().add(getDetails());
+                collapsedDetails = false;
+                detailBtn.setText("Hide Details");
+            } else {
+                layout.getChildren().remove(4);
+                collapsedDetails = true;
+                detailBtn.setText("Show Details");
+            }
+            setGraphic(layout);
+        });
+
 
         removeBtn.setOnMouseClicked(mouseEvent -> {
             try {
@@ -73,16 +89,31 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
                             : "No description available"
             );
 
-            String genres = movie.getGenres();
-            genre.setText(genres);
+
+            genre.setText(String.join(",", getItem().getGenres()));
 
             setGraphic(layout);
         }
     }
 
-    private Label getDescription() {
-        Label descriptionLabel = new Label(detail.getText());
-        descriptionLabel.getStyleClass().add("text-white");
-        return descriptionLabel;
+    private VBox getDetails() {
+        VBox details = new VBox();
+        Label releaseYear = new Label("Release Year: " + getItem().getReleaseYear());
+        Label length = new Label("Length: " + getItem().getLengthInMinutes() + " minutes");
+        Label rating = new Label("Rating: " + getItem().getRating() + "/10");
+
+
+
+
+        releaseYear.getStyleClass().add("text-white");
+        length.getStyleClass().add("text-white");
+        rating.getStyleClass().add("text-white");
+
+
+        details.getChildren().add(releaseYear);
+        details.getChildren().add(rating);
+        details.getChildren().add(length);
+
+        return details;
     }
 }
