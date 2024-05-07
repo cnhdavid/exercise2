@@ -1,11 +1,14 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.HomeController;
+import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +22,7 @@ class HomeControllerTest {
 
     // Überprüft, ob bei Initialisierung alle Filme geladen und sowohl observableMovies als auch allMovies gefüllt sind und gleich viele Elemente enthalten.
     @Test
-    void at_initialization_allMovies_and_observableMovies_should_be_filled_and_equal() {
+    void at_initialization_allMovies_and_observableMovies_should_be_filled_and_equal() throws IOException {
         homeController.loadMovies();
         List<Movie> allMovies = homeController.observableMovies;
         assertEquals(allMovies.size(), homeController.allMovies.size());
@@ -27,7 +30,7 @@ class HomeControllerTest {
 
     // Testet, ob eine Sortierung in aufsteigender Reihenfolge erfolgt, wenn zuvor noch keine Sortierung angewendet wurde.
     @Test
-    void if_not_yet_sorted_sort_is_applied_in_ascending_order() {
+    void if_not_yet_sorted_sort_is_applied_in_ascending_order() throws IOException {
         homeController.loadMovies();
         homeController.sortedState = SortedState.NONE;
         homeController.sortMovies();
@@ -36,7 +39,7 @@ class HomeControllerTest {
 
     // Überprüft, ob nach einer vorherigen aufsteigenden Sortierung eine absteigende Sortierung erfolgt.
     @Test
-    void if_last_sort_ascending_next_sort_should_be_descending() {
+    void if_last_sort_ascending_next_sort_should_be_descending() throws IOException {
         homeController.loadMovies();
         homeController.sortedState = SortedState.ASCENDING;
         homeController.sortMovies();
@@ -45,7 +48,7 @@ class HomeControllerTest {
 
     // Testet, ob nach einer vorherigen absteigenden Sortierung eine aufsteigende Sortierung erfolgt.
     @Test
-    void if_last_sort_descending_next_sort_should_be_ascending() {
+    void if_last_sort_descending_next_sort_should_be_ascending() throws IOException {
         homeController.loadMovies();
         homeController.sortedState = SortedState.DESCENDING;
         homeController.sortMovies();
@@ -54,7 +57,7 @@ class HomeControllerTest {
 
     // Überprüft, ob die Abfrage korrekt ignoriert, ob die Groß- oder Kleinschreibung übereinstimmt.
     @Test
-    void query_filter_matches_with_lower_and_uppercase_letters(){
+    void query_filter_matches_with_lower_and_uppercase_letters() throws IOException {
         homeController.loadMovies();
         String query = "IfE";
         List<Movie> filteredMovies = homeController.filterByQuery(homeController.observableMovies, query);
@@ -69,7 +72,7 @@ class HomeControllerTest {
 
     // Überprüft, ob bei einer null-Abfrage die ungefilterte Filmliste zurückgegeben wird.
     @Test
-    void query_filter_with_null_value_returns_unfiltered_list() {
+    void query_filter_with_null_value_returns_unfiltered_list() throws IOException {
         homeController.loadMovies();
         List<Movie> filteredMovies = homeController.filterByQuery(homeController.observableMovies, null);
         assertEquals(homeController.observableMovies.size(), filteredMovies.size());
@@ -77,7 +80,7 @@ class HomeControllerTest {
 
     // Testet, ob bei einem null-Genre die ungefilterte Filmliste zurückgegeben wird.
     @Test
-    void genre_filter_with_null_value_returns_unfiltered_list() {
+    void genre_filter_with_null_value_returns_unfiltered_list() throws IOException {
         homeController.loadMovies();
         List<Movie> filteredMovies = homeController.filterByGenre(homeController.observableMovies, null);
         assertEquals(homeController.observableMovies.size(), filteredMovies.size());
@@ -85,7 +88,7 @@ class HomeControllerTest {
 
     // Überprüft, ob alle Filme mit einem bestimmten Genre korrekt gefiltert werden.
     @Test
-    void genre_filter_returns_all_movies_containing_given_genre() {
+    void genre_filter_returns_all_movies_containing_given_genre() throws IOException {
         homeController.loadMovies();
         List<Movie> filteredMovies = homeController.filterByGenre(homeController.observableMovies, Genre.DRAMA);
         assertTrue(filteredMovies.stream().allMatch(movie -> movie.getGenres().contains(Genre.DRAMA)));
@@ -93,7 +96,7 @@ class HomeControllerTest {
 
     // Testet, ob keine Filterung erfolgt, wenn keine Abfrage oder kein Genre festgelegt ist.
     @Test
-    void no_filtering_ui_if_empty_query_or_no_genre_is_set() {
+    void no_filtering_ui_if_empty_query_or_no_genre_is_set() throws IOException {
         homeController.loadMovies();
         homeController.applyAllFilters("", null, "", "");
         assertEquals(homeController.allMovies.size(), homeController.observableMovies.size());
@@ -120,7 +123,7 @@ class HomeControllerTest {
 
     // Testet, ob die Anzahl der Filme eines bestimmten Regisseurs korrekt gezählt wird.
     @Test
-    void count_movies_from_specific_director() {
+    void count_movies_from_specific_director() throws IOException {
         homeController.loadMovies();
         long count = homeController.countMoviesFrom(homeController.observableMovies, "Steven Spielberg");
         assertEquals(2, count);
@@ -128,7 +131,7 @@ class HomeControllerTest {
 
     // Testet, ob bei einer Filterung nach Bewertung eine leere Liste zurückgegeben wird, wenn keine Filme den Kriterien entsprechen.
     @Test
-    void filter_by_rating_should_return_empty_list_if_no_movies_meet_the_criteria() {
+    void filter_by_rating_should_return_empty_list_if_no_movies_meet_the_criteria() throws IOException {
 
         homeController.loadMovies();
         String rating = "10.0";
@@ -139,7 +142,7 @@ class HomeControllerTest {
 
     // Testet, ob bei einer null- oder leeren Bewertung alle Filme zurückgegeben werden.
     @Test
-    void filter_by_rating_should_return_all_movies_if_rating_is_null_or_empty() {
+    void filter_by_rating_should_return_all_movies_if_rating_is_null_or_empty() throws IOException {
 
         homeController.loadMovies();
 
@@ -152,7 +155,7 @@ class HomeControllerTest {
 
     // Überprüft, ob die Filterung nach Erscheinungsjahr korrekt Filme im angegebenen Bereich zurückgibt.
     @Test
-    void filter_by_release_year_should_return_movies_within_specified_range() {
+    void filter_by_release_year_should_return_movies_within_specified_range() throws IOException {
 
         homeController.loadMovies();
         int startYear = 2000;
@@ -168,7 +171,7 @@ class HomeControllerTest {
 
     // Testet, ob bei einer Filterung nach Erscheinungsjahr eine leere Liste zurückgegeben wird, wenn keine Filme den Kriterien entsprechen.
     @Test
-    void filter_by_release_year_should_return_empty_list_if_no_movies_meet_the_criteria() {
+    void filter_by_release_year_should_return_empty_list_if_no_movies_meet_the_criteria() throws IOException {
 
         homeController.loadMovies();
         int startYear = 2025;
@@ -181,7 +184,7 @@ class HomeControllerTest {
 
     // Überprüft, ob der am häufigsten vorkommende Schauspieler korrekt ermittelt wird.
     @Test
-    void get_most_popular_actor_returns_correct_result() {
+    void get_most_popular_actor_returns_correct_result() throws IOException {
 
         homeController.loadMovies();
 
@@ -194,7 +197,7 @@ class HomeControllerTest {
 
     // Testet, ob die Länge des längsten Filmtitels korrekt zurückgegeben wird.
     @Test
-    void get_longest_movie_title_returns_correct_length() {
+    void get_longest_movie_title_returns_correct_length() throws IOException {
 
         homeController.loadMovies();
 

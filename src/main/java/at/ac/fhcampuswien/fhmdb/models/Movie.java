@@ -1,6 +1,7 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -70,7 +71,7 @@ public class Movie {
     }
 
 
-    public static List<Movie> initializeMovies() throws IOException, IOException {
+    public static List<Movie> initializeMovies() throws IOException, IOException, MovieApiException {
         MovieAPI movieAPI = new MovieAPI();
 
         List<Movie> movies = movieAPI.fetchMovies("","","", "");

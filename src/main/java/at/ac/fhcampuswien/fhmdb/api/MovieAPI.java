@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb.api;
 
+import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import com.google.gson.reflect.TypeToken;
@@ -21,7 +22,7 @@ public class MovieAPI {
     private final String baseUrl = "https://prog2.fh-campuswien.ac.at/movies";
 
     // Filme von der externen API abrufen
-    public List<Movie> fetchMovies(String searchText, Object genre, String rating, String releaseYearStr) throws IOException {
+    public List<Movie> fetchMovies(String searchText, Object genre, String rating, String releaseYearStr) throws IOException, MovieApiException {
         // releaseYearStr in einen Integer parsen, wenn es nicht leer ist
 
         String genreString = "";
@@ -41,7 +42,7 @@ public class MovieAPI {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response + " with body " + response.body().string());
+                throw new MovieApiException("Error fetching movies from API. Unexpected response: " + response);
             }
             System.out.println("Response: " + response);
             String jsonResponse = response.body().string();

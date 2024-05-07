@@ -6,12 +6,13 @@ package at.ac.fhcampuswien.fhmdb;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
+import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
+import at.ac.fhcampuswien.fhmdb.exceptions.MovieApiException;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
@@ -27,6 +28,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -65,12 +67,16 @@ public class HomeController implements Initializable {
     public SortedState sortedState;
 
     // Instanz der MovieAPI-Klasse
-    private final MovieAPI movieAPI = new MovieAPI();
+    private MovieAPI movieAPI = new MovieAPI();
     public Button watchlistBtn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        loadMovies(); // Filme laden
+        try {
+            loadMovies(); // Filme laden
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         initializeLayout(); // Layout initialisieren
         try {
             // Initialisiere den DatabaseManager
@@ -81,11 +87,13 @@ public class HomeController implements Initializable {
             checkDatabaseConnection();
 
             // Weitere Initialisierungsschritte hier...
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (DatabaseException e) {
             // Behandle den Fehler angemessen
+            showErrorDialog("Database Error", "Error initializing database connection: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
     private void checkDatabaseConnection() {
         if (databaseManager != null && databaseManager.getConnectionSource() != null) {
             System.out.println("Datenbankverbindung hergestellt.");
@@ -95,7 +103,7 @@ public class HomeController implements Initializable {
     }
 
     // Filme laden
-    public void loadMovies() {
+    public void loadMovies() throws IOException {
         try {
             // Filme von der API abrufen
             List<Movie> movies = movieAPI.fetchMovies("", "", "", "");
@@ -105,6 +113,10 @@ public class HomeController implements Initializable {
             sortedState = sortedState.NONE;
 
         } catch (IOException e) {
+            showErrorDialog("IO Error", "Error fetching movies from API: " + e.getMessage());
+            e.printStackTrace();
+        } catch (MovieApiException e) {
+            showErrorDialog("API Error", "Error fetching movies from API: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -217,6 +229,8 @@ public class HomeController implements Initializable {
 
         } catch (IOException e) {
             System.err.println("Fehler beim Abrufen der Filme: " + e.getMessage());
+        } catch (MovieApiException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -313,4 +327,14 @@ public class HomeController implements Initializable {
             // Handle any potential errors (e.g., FXML file not found)
         }
     }
+
+    // Methode zum Anzeigen von Fehlermeldungen im UI
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
+
