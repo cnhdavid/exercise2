@@ -31,6 +31,7 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
         super();
 
         // Styling
+        detailBtn.setStyle("-fx-background-color: #f5c518;");
         removeBtn.setStyle("-fx-background-color: #f5c518;");
         title.getStyleClass().add("text-yellow");
         detail.getStyleClass().add("text-white");
@@ -45,7 +46,7 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
         layout.setSpacing(10);
         layout.setAlignment(Pos.CENTER_LEFT);
         buttons.setPadding(new Insets(10));
-        buttons.setSpacing(10);
+        buttons.setSpacing(20);
         buttons.setAlignment(Pos.TOP_RIGHT);
 
         // Ereignishandler für den Detail-Button
