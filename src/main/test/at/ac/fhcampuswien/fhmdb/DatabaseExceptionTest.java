@@ -64,7 +64,6 @@ class DatabaseExceptionTest {
             List<MovieEntity> moviesAfterCaching = databaseManager.getMovieDao().queryForAll();
             assertNotEquals(0, moviesAfterCaching.size());
 
-            // Hier könntest du weitere Überprüfungen hinzufügen, um sicherzustellen,
             // dass die Filme korrekt in die Datenbank eingefügt wurden
         } catch (SQLException e) {
             fail("SQLException: " + e.getMessage());

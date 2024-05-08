@@ -104,7 +104,6 @@ public class MovieEntity {
     @Override
     public String toString() {
         // Beispiel, um Titel und Beschreibung zurückzugeben
-        // Du kannst andere Attribute wählen oder hinzufügen, die du anzeigen möchtest
         return getTitle() + " - " + getDescription();
     }
 }

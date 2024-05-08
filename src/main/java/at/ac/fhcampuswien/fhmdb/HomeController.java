@@ -247,6 +247,19 @@ public class HomeController implements Initializable {
                 .toList();
     }
 
+    // Filme nach Genre filtern
+    public List<Movie> filterByGenre(List<Movie> movies, Genre genre){
+        if(genre == null) return movies;
+
+        if(movies == null) {
+            throw new IllegalArgumentException("movies must not be null");
+        }
+        return movies.stream()
+                .filter(Objects::nonNull)
+                .filter(movie -> movie.getGenres().contains(genre))
+                .toList();
+    }
+
     // Filme nach Bewertung filtern
     public List<Movie> filterByRating(List<Movie> movies, String rating) {
         if (rating == null || rating.isEmpty()) return movies;
@@ -311,5 +324,22 @@ public class HomeController implements Initializable {
         return movies.stream()
                 .filter(movie -> Integer.parseInt(movie.getReleaseYear()) >= startYear && Integer.parseInt(movie.getReleaseYear()) <= endYear)
                 .collect(Collectors.toList());
+    }
+
+    public String getMostPopularActor(List<Movie> movies) {
+        return movies.stream()
+                .flatMap(movie -> movie.getMainCast().stream())
+                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    public int getLongestMovieTitle(List<Movie> movies) {
+        return movies.stream()
+                .mapToInt(movie -> movie.getTitle().length())
+                .max()
+                .orElse(0);
     }
 }
