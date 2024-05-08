@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import com.jfoenix.controls.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -29,16 +28,10 @@
                     <Insets left="2.0" right="2.0" />
                 </padding>
             </Label>
-            <Region HBox.hgrow="ALWAYS" />
+            <JFXButton fx:id="homeBtn" onAction="#returnToHomeScreen" styleClass="background-yellow" stylesheets="@styles.css" text="Back to Home" />
         </children>
     </HBox>
-    <!-- Bestehender Inhalt der Watchlist-View -->
     <JFXListView fx:id="watchlistListView" style="-fx-background-color: black;" styleClass="background-black" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
-    <HBox>
-
-        <Region HBox.hgrow="ALWAYS" /> <!-- Spacer -->
-        <JFXButton fx:id="homeBtn" onAction="#returnToHomeScreen" styleClass="background-yellow" stylesheets="@styles.css" text="Back to Home" />
-    </HBox>
     <VBox.margin>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </VBox.margin>
