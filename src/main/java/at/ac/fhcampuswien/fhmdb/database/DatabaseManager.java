@@ -17,7 +17,7 @@ import com.j256.ormlite.table.TableUtils;
 
 public class DatabaseManager {
     // Datenbank URL, Benutzername und Passwort
-    private static final String DATABASE_URL = "jdbc:h2:mem:default";
+    private static final String DATABASE_URL = "jdbc:h2:./data/moviedb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE";
     private static final String USERNAME = "prog";
     private static final String PASSWORD = "prog";
 
@@ -103,5 +103,11 @@ public class DatabaseManager {
             // Fehlermeldung bei Problemen mit der API oder Datenbank
             System.err.println("Fehler beim Cachen der Filme von der API: " + e.getMessage());
         }
+    }
+    public List<MovieEntity> getAllMovies() throws SQLException {
+        if (movieDao == null) {
+            throw new IllegalStateException("DAO not initialized");
+        }
+        return movieDao.queryForAll();
     }
 }

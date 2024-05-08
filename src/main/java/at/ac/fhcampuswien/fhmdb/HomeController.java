@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.database.DatabaseManager;
+import at.ac.fhcampuswien.fhmdb.database.MovieEntity;
 import at.ac.fhcampuswien.fhmdb.database.WatchlistMovieEntity;
 import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.exceptions.DatabaseException;
@@ -80,6 +81,7 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        displayCachedMovies();
         try {
             loadMovies(); // Filme laden
         } catch (IOException e) {
@@ -109,6 +111,24 @@ public class HomeController implements Initializable {
             System.err.println("Fehler beim Herstellen der Verbindung zur Datenbank.");
         }
     }
+
+    public void displayCachedMovies() {
+        try {
+            List<MovieEntity> movies = DatabaseManager.getDatabaseManager().getAllMovies();
+            System.out.println("Gecachte Filme:");
+            for (MovieEntity movie : movies) {
+                System.out.println(movie.getTitle());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Hier könnte man z.B. eine Fehlermeldung in der Benutzeroberfläche anzeigen
+        }
+    }
+    @FXML
+    public void onDisplayMoviesClicked() {
+        displayCachedMovies();
+    }
+
 
     // Filme laden
     public void loadMovies() throws IOException {

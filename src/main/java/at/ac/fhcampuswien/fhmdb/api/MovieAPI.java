@@ -42,19 +42,25 @@ public class MovieAPI {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new MovieApiException("Error fetching movies from API. Unexpected response: " + response);
+                try {
+                    throw new MovieApiException("Error fetching movies from API. Unexpected response: " + response);
+                } catch (MovieApiException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            System.out.println("Response: " + response);
-            String jsonResponse = response.body().string();
-            System.out.println("Response JSON: " + jsonResponse);
 
-            Type listType = new TypeToken<ArrayList<Movie>>() {}.getType();
-            ArrayList<Movie> movies = gson.fromJson(jsonResponse, listType);
-            System.out.println(movies);
+                System.out.println("Response: " + response);
+                String jsonResponse = response.body().string();
+                System.out.println("Response JSON: " + jsonResponse);
 
-            return movies != null ? movies : new ArrayList<>();
+                Type listType = new TypeToken<ArrayList<Movie>>() {
+                }.getType();
+                ArrayList<Movie> movies = gson.fromJson(jsonResponse, listType);
+                System.out.println(movies);
+
+                return movies != null ? movies : new ArrayList<>();
+            }
         }
-    }
 
     // URL für die Anfrage konstruieren
     public String constructUrl(String searchText, String genre, String rating, String releaseYear) throws IOException {
