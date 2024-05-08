@@ -20,7 +20,7 @@ public class WatchlistMovieCell extends ListCell<WatchlistMovieEntity> {
     private final Label title = new Label();
     private final Label detail = new Label();
     private final Label genre = new Label();
-    private final JFXButton removeBtn = new JFXButton("Remove");
+    private final JFXButton removeBtn = new JFXButton("Remove from Watchlist");
     private final JFXButton detailBtn = new JFXButton("Show Details");
     private final HBox buttons = new HBox(removeBtn, detailBtn);
     private final VBox layout = new VBox(title, detail, genre, buttons);

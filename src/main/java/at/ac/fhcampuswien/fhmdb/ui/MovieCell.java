@@ -23,7 +23,7 @@ public class MovieCell extends ListCell<Movie> {
     private final Label detail = new Label();
     private final Label genre = new Label();
     private final JFXButton detailBtn = new JFXButton("Show Details");
-    public final JFXButton watchlistBtn = new JFXButton("Watchlist");
+    public final JFXButton watchlistBtn = new JFXButton("Add to Watchlist");
     private final HBox buttons = new HBox(detailBtn, watchlistBtn);
     private final VBox layout = new VBox(title, detail, genre, buttons);
     private boolean collapsedDetails = true;
